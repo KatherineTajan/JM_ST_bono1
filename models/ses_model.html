@@ -1,0 +1,789 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Suavización Exponencial Simple (SES) &#8212; Análisis de Series de Tiempo: Modelos de Suavización Exponencial</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'models/ses_model';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Suavización Exponencial de Segundo Orden (DES)" href="holt_model.html" />
+    <link rel="prev" title="Series de tiempos" href="series_de_tiempos.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Análisis de Series de Tiempo: Modelos de Suavización Exponencial</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Introducción
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../eda.html">EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="series_de_tiempos.html">Series de tiempos</a></li>
+
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Suavización Exponencial Simple (SES)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="holt_model.html">Suavización Exponencial de Segundo Orden (DES)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conclusions.html">Conclusiones</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/models/ses_model.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Suavización Exponencial Simple (SES)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="suavizacion-exponencial-simple-ses">
+<h1>Suavización Exponencial Simple (SES)<a class="headerlink" href="#suavizacion-exponencial-simple-ses" title="Link to this heading">#</a></h1>
+<p>Uno de los enfoques más comunes y efectivos para el análisis de series de tiempo es la <strong>suavización exponencial simple (SES)</strong>. Este método es particularmente útil cuando los datos presentan una tendencia suave o fluctuaciones menores, y no contienen un patrón de estacionalidad o tendencia clara. La suavización exponencial simple se basa en un concepto simple: asignar un peso decreciente a los datos pasados, lo que significa que los valores más recientes tienen una mayor influencia en la predicción futura que los valores anteriores.</p>
+<p>La SES puede describirse matemáticamente como:</p>
+<div class="math notranslate nohighlight">
+\[
+y_{t+1} = \lambda y_t + (1 - \lambda) y_{t-1}
+\]</div>
+<p>Donde:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\((y_{t+1}) \)</span> es el valor predicho.</p></li>
+<li><p><span class="math notranslate nohighlight">\(y_t\)</span>  es el valor observado más reciente.</p></li>
+<li><p><span class="math notranslate nohighlight">\( \lambda \)</span> es el factor de suavización, con un valor entre 0 y 1, que determina el peso de los valores pasados.</p></li>
+</ul>
+<p>Un valor de <span class="math notranslate nohighlight">\(\lambda\)</span> cercano a 1 dará mayor peso a los datos más recientes, mientras que un valor cercano a 0 asignará más importancia a los valores anteriores. En nuestro análisis, hemos utilizado una <span class="math notranslate nohighlight">\(\lambda = 0.4\)</span> lo que proporciona un balance entre el pasado reciente y los valores más antiguos.</p>
+<p>En este trabajo, hemos aplicado el método de <strong>suavización exponencial simple</strong> para analizar la potencia eléctrica generada por las microturbinas en diferentes experimentos.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importar las librerías necesarias</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Ruta a la carpeta donde se encuentran los archivos de entrenamiento</span>
+<span class="n">train_folder</span> <span class="o">=</span> <span class="s1">&#39;/Users/josejavier-yenifer/Documents/Serie de Tiempo/Bono 1/train&#39;</span>
+
+<span class="c1"># Nombres de los archivos CSV</span>
+<span class="n">train_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24.csv&#39;</span><span class="p">]</span>
+
+<span class="c1"># Cargar los archivos CSV en variables con prefijo &#39;df_&#39; y nombre del archivo (sin .csv)</span>
+<span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">train_files</span><span class="p">:</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Eliminar la extensión .csv</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">train_folder</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    
+    <span class="c1"># Crear una variable dinámica con el nombre df_&lt;nombre_archivo&gt;</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;df_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="c1"># Guardar el DataFrame para mostrar luego</span>
+    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">file_name</span><span class="p">,</span> <span class="nb">globals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;df_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Función de suavización exponencial simple</span>
+<span class="k">def</span> <span class="nf">firstsmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">ytilde</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ytilde</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">lambda_</span><span class="p">)</span> <span class="o">*</span> <span class="n">start</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+        <span class="n">ytilde</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">lambda_</span><span class="p">)</span> <span class="o">*</span> <span class="n">ytilde</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ytilde</span>
+
+<span class="c1"># Función de métricas de precisión</span>
+<span class="k">def</span> <span class="nf">measacc_fs</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
+    <span class="n">prederr</span> <span class="o">=</span> <span class="n">y_true</span> <span class="o">-</span> <span class="n">y_pred</span>
+    <span class="n">SSE</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prederr</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">MAPE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">prederr</span> <span class="o">/</span> <span class="n">y_true</span><span class="p">))</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="n">MAD</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">prederr</span><span class="p">))</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="n">MSD</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prederr</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;SSE&quot;</span><span class="p">:</span> <span class="n">SSE</span><span class="p">,</span> <span class="s2">&quot;MAPE&quot;</span><span class="p">:</span> <span class="n">MAPE</span><span class="p">,</span> <span class="s2">&quot;MAD&quot;</span><span class="p">:</span> <span class="n">MAD</span><span class="p">,</span> <span class="s2">&quot;MSD&quot;</span><span class="p">:</span> <span class="n">MSD</span><span class="p">}</span>
+
+<span class="c1"># Función para calcular el MAE</span>
+<span class="k">def</span> <span class="nf">calculate_mae</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">MAE</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">y_true</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MAE</span>
+
+<span class="c1"># Función para calcular el intervalo de predicción</span>
+<span class="k">def</span> <span class="nf">prediction_interval</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+    <span class="n">std_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>  <span class="c1"># Desviación estándar de los errores</span>
+    <span class="n">z_score</span> <span class="o">=</span> <span class="mf">1.96</span>  <span class="c1"># Para un nivel de confianza del 95%</span>
+    <span class="n">interval_size</span> <span class="o">=</span> <span class="n">z_score</span> <span class="o">*</span> <span class="n">std_err</span>
+    <span class="k">return</span> <span class="n">interval_size</span>
+
+<span class="c1"># Parámetro lambda (tasa de suavización)</span>
+<span class="n">lambda_</span> <span class="o">=</span> <span class="mf">0.4</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># División en entrenamiento, validación y test</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># 80% para entrenamiento</span>
+<span class="n">val_size</span> <span class="o">=</span> <span class="mf">0.1</span>    <span class="c1"># 10% para validación</span>
+<span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.1</span>   <span class="c1"># 10% para test</span>
+
+<span class="c1"># Crear un DataFrame para almacenar todas las métricas</span>
+<span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Experimento&#39;</span><span class="p">,</span> <span class="s1">&#39;SSE_Train&#39;</span><span class="p">,</span> <span class="s1">&#39;MAPE_Train&#39;</span><span class="p">,</span> <span class="s1">&#39;MAD_Train&#39;</span><span class="p">,</span> <span class="s1">&#39;MSD_Train&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;SSE_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MAPE_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MAD_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MSD_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MAE_Test&#39;</span><span class="p">])</span>
+
+<span class="c1"># Aplicar suavización exponencial simple manual a cada serie de tiempo</span>
+<span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="c1"># Definir la longitud de cada conjunto</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">train_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">train_size</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">val_end</span> <span class="o">=</span> <span class="n">train_end</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_size</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    
+    <span class="c1"># Dividir en conjuntos de entrenamiento, validación y test</span>
+    <span class="n">train_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">]</span>
+    <span class="n">val_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">]</span>
+    <span class="n">test_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:]</span>
+    
+    <span class="c1"># Aplicar la suavización en los datos de entrenamiento</span>
+    <span class="n">smooth_train</span> <span class="o">=</span> <span class="n">firstsmooth</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">)</span>
+    
+    <span class="c1"># Suavización para el conjunto de validación usando el último valor del entrenamiento</span>
+    <span class="n">smooth_val</span> <span class="o">=</span> <span class="n">firstsmooth</span><span class="p">(</span><span class="n">val_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">smooth_train</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Suavización para el conjunto de test usando el último valor del conjunto de validación</span>
+    <span class="n">smooth_test</span> <span class="o">=</span> <span class="n">firstsmooth</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">smooth_val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Intervalo de predicción</span>
+    <span class="n">pred_interval</span> <span class="o">=</span> <span class="n">prediction_interval</span><span class="p">(</span><span class="n">smooth_test</span><span class="p">)</span>
+    
+    <span class="c1"># Graficar la serie original con tres colores para los conjuntos de datos</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Entrenamiento&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Validación&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Test&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Graficar la suavización en los tres conjuntos</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">],</span> <span class="n">smooth_train</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Suavización SES Entrenamiento ($\lambda=</span><span class="si">{</span><span class="n">lambda_</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">],</span> <span class="n">smooth_val</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Suavización SES Validación&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">smooth_test</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Suavización SES Test&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Graficar el intervalo de predicción para el test</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">smooth_test</span> <span class="o">-</span> <span class="n">pred_interval</span><span class="p">,</span> <span class="n">smooth_test</span> <span class="o">+</span> <span class="n">pred_interval</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Intervalo de Predicción 95%&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Configuración del gráfico</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SES con Entrenamiento, Validación y Test - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Tiempo&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Potencia Eléctrica (W)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1"># Calcular las métricas de precisión en el conjunto de entrenamiento</span>
+    <span class="n">metrics_train</span> <span class="o">=</span> <span class="n">measacc_fs</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_train</span><span class="p">)</span>
+    
+    <span class="c1"># Calcular las métricas de precisión en el conjunto de validación</span>
+    <span class="n">metrics_val</span> <span class="o">=</span> <span class="n">measacc_fs</span><span class="p">(</span><span class="n">val_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_val</span><span class="p">)</span>
+    
+    <span class="c1"># Calcular solo el MAE (MAD) en el conjunto de test</span>
+    <span class="n">mae_test</span> <span class="o">=</span> <span class="n">calculate_mae</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_test</span><span class="p">)</span>
+    
+    <span class="c1"># Crear un DataFrame temporal con las métricas del experimento actual</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Experimento&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">],</span>
+        <span class="s1">&#39;SSE_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;SSE&#39;</span><span class="p">]],</span> <span class="s1">&#39;MAPE_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MAPE&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;MAD_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MAD&#39;</span><span class="p">]],</span> <span class="s1">&#39;MSD_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MSD&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;SSE_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;SSE&#39;</span><span class="p">]],</span> <span class="s1">&#39;MAPE_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;MAPE&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;MAD_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;MAD&#39;</span><span class="p">]],</span> <span class="s1">&#39;MSD_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;MSD&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;MAE_Test&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">mae_test</span><span class="p">]</span>
+    <span class="p">})</span>
+    
+    <span class="c1"># Usar pd.concat() para agregar las filas al DataFrame de métricas</span>
+    <span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">metrics_df</span><span class="p">,</span> <span class="n">temp_df</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;&gt;:84: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+&lt;&gt;:84: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+/var/folders/pc/g1c35bc91zbfqvk3gwrrc_5c0000gn/T/ipykernel_58529/3409707953.py:84: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+  plt.plot(df[&#39;time&#39;][:train_end], smooth_train, color=&#39;red&#39;, linestyle=&#39;--&#39;, label=f&#39;Suavización SES Entrenamiento ($\lambda={lambda_}$)&#39;)
+</pre></div>
+</div>
+<img alt="../_images/ae55259cab35a611877ccdfe326a8046ad2e3bd24dbbc86b8277a75ddd296ad5.png" src="../_images/ae55259cab35a611877ccdfe326a8046ad2e3bd24dbbc86b8277a75ddd296ad5.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/pc/g1c35bc91zbfqvk3gwrrc_5c0000gn/T/ipykernel_58529/3409707953.py:118: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  metrics_df = pd.concat([metrics_df, temp_df], ignore_index=True)
+</pre></div>
+</div>
+<img alt="../_images/fa70e9843e498644ea48e40edf63ca8c73b3d72b0a8ba0553b045a8b9f0d13ac.png" src="../_images/fa70e9843e498644ea48e40edf63ca8c73b3d72b0a8ba0553b045a8b9f0d13ac.png" />
+<img alt="../_images/b517abf093b7bf5b290a5b9dab124b47f2918cafdf10e6f8a341cca463c977f2.png" src="../_images/b517abf093b7bf5b290a5b9dab124b47f2918cafdf10e6f8a341cca463c977f2.png" />
+<img alt="../_images/5608a8b884135291a0c84d7900fe13184ece7a68b6aadfdadc8c0772280f6e5e.png" src="../_images/5608a8b884135291a0c84d7900fe13184ece7a68b6aadfdadc8c0772280f6e5e.png" />
+<img alt="../_images/7c03b72b7a4fef145f22c18be88b8d082007fb45108755ee37b84d1d905a9d0f.png" src="../_images/7c03b72b7a4fef145f22c18be88b8d082007fb45108755ee37b84d1d905a9d0f.png" />
+<img alt="../_images/b0abfcc8027ec766fd773c3f9a4c58979ac9d3bfd3793239ba6c5e7f51e8f43f.png" src="../_images/b0abfcc8027ec766fd773c3f9a4c58979ac9d3bfd3793239ba6c5e7f51e8f43f.png" />
+</div>
+</div>
+<ol class="arabic simple">
+<li><p><strong>Ex_1 (Primera gráfica)</strong>:</p>
+<ul class="simple">
+<li><p>En esta serie, los datos de potencia eléctrica muestran dos grandes picos seguidos por una caída abrupta.</p></li>
+<li><p>El modelo de Suavización Exponencial Simple (SES) con (\lambda = 0.4) sigue de manera eficiente los picos y las caídas del conjunto de entrenamiento.</p></li>
+<li><p>Sin embargo, al final, durante la fase de validación y prueba, el modelo parece estabilizarse en un valor constante, lo que podría indicar una falta de adaptación a los cambios abruptos.</p></li>
+</ul>
+</li>
+<li><p><strong>Ex_9 (Segunda gráfica)</strong>:</p>
+<ul class="simple">
+<li><p>Aquí, la serie de tiempo muestra un crecimiento escalonado y sostenido en la potencia eléctrica.</p></li>
+<li><p>El SES sigue bien las fluctuaciones en la fase de entrenamiento, pero nuevamente, en la validación y prueba, tiende a sobrestimar al suavizar excesivamente el crecimiento de los últimos puntos.</p></li>
+<li><p>Este comportamiento indica que el SES puede no captar bien los aumentos constantes en la tendencia, lo que puede ser un área de mejora con modelos más avanzados.</p></li>
+</ul>
+</li>
+<li><p><strong>Ex_20 y Ex_21 (Tercera y cuarta gráfica)</strong>:</p>
+<ul class="simple">
+<li><p>Ambas series muestran un patrón repetitivo de picos y caídas abruptas.</p></li>
+<li><p>El SES capta bien las transiciones en las fases de entrenamiento, aunque suaviza ligeramente en exceso los picos.</p></li>
+<li><p>Durante la fase de validación y prueba, el SES tiene problemas para anticipar correctamente los picos y caídas, manteniendo una predicción más constante.</p></li>
+</ul>
+</li>
+<li><p><strong>Ex_23 y Ex_24 (Quinta y sexta gráfica)</strong>:</p>
+<ul class="simple">
+<li><p>Estas series presentan un comportamiento cíclico, con múltiples picos.</p></li>
+<li><p>El SES sigue de manera adecuada los picos del conjunto de entrenamiento.</p></li>
+<li><p>En la fase de prueba, el SES tiende a suavizar demasiado, y aunque predice el comportamiento general, no sigue con precisión los picos de los datos reales.</p></li>
+</ul>
+</li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mostrar el DataFrame con las métricas</span>
+<span class="n">metrics_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Experimento</th>
+      <th>SSE_Train</th>
+      <th>MAPE_Train</th>
+      <th>MAD_Train</th>
+      <th>MSD_Train</th>
+      <th>SSE_Val</th>
+      <th>MAPE_Val</th>
+      <th>MAD_Val</th>
+      <th>MSD_Val</th>
+      <th>MAE_Test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ex_1</td>
+      <td>6.278002e+05</td>
+      <td>0.383271</td>
+      <td>7.963499</td>
+      <td>79.107882</td>
+      <td>5.179615e+04</td>
+      <td>0.664518</td>
+      <td>6.562480</td>
+      <td>52.213863</td>
+      <td>6.911826</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ex_9</td>
+      <td>1.801089e+07</td>
+      <td>2.623333</td>
+      <td>42.964697</td>
+      <td>1904.906807</td>
+      <td>2.471974e+06</td>
+      <td>1.911820</td>
+      <td>44.725072</td>
+      <td>2093.119806</td>
+      <td>46.965909</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ex_20</td>
+      <td>5.846009e+06</td>
+      <td>2.456404</td>
+      <td>33.222419</td>
+      <td>1125.097908</td>
+      <td>7.689526e+05</td>
+      <td>1.269902</td>
+      <td>33.710223</td>
+      <td>1184.826762</td>
+      <td>33.313918</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ex_21</td>
+      <td>5.676552e+06</td>
+      <td>2.519509</td>
+      <td>32.731631</td>
+      <td>1092.485081</td>
+      <td>7.793841e+05</td>
+      <td>1.404732</td>
+      <td>33.823424</td>
+      <td>1200.899943</td>
+      <td>33.424764</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ex_23</td>
+      <td>8.463306e+06</td>
+      <td>2.007281</td>
+      <td>33.549776</td>
+      <td>1151.470207</td>
+      <td>1.069381e+06</td>
+      <td>1.333398</td>
+      <td>33.740317</td>
+      <td>1164.903516</td>
+      <td>33.535197</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>ex_24</td>
+      <td>8.213038e+06</td>
+      <td>2.017377</td>
+      <td>33.495498</td>
+      <td>1137.855150</td>
+      <td>1.027053e+06</td>
+      <td>1.945376</td>
+      <td>33.493879</td>
+      <td>1138.640129</td>
+      <td>33.599245</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>El análisis de las métricas muestra una clara variación en el rendimiento de la suavización exponencial simple (SES) entre los diferentes experimentos:</p>
+<ul class="simple">
+<li><p><strong>SSE (Suma de los Errores Cuadrados)</strong>: Los conjuntos de entrenamiento muestran valores más altos en algunos experimentos, como en <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>, lo que sugiere una mayor discrepancia entre las predicciones y los valores reales. En general, la validación tiene menores SSE, pero experimentos como <code class="docutils literal notranslate"><span class="pre">ex_9</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_24</span></code> siguen siendo significativamente elevados.</p></li>
+<li><p><strong>MAPE (Error Porcentual Absoluto Medio)</strong>: Se observa que los errores porcentuales en el conjunto de validación son bajos en comparación con los de entrenamiento, lo cual puede sugerir que el modelo se ajusta bien a los datos de validación en algunos casos, como <code class="docutils literal notranslate"><span class="pre">ex_1</span></code>. Sin embargo, los experimentos <code class="docutils literal notranslate"><span class="pre">ex_9</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_24</span></code> tienen un MAPE considerablemente más alto, indicando un rendimiento más pobre.</p></li>
+<li><p><strong>MAD (Desviación Absoluta Media)</strong>: El error absoluto muestra una consistencia similar entre los conjuntos de entrenamiento y validación, excepto en <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>, donde los valores de error son elevados.</p></li>
+<li><p><strong>MSD (Desviación Media Cuadrática)</strong>: En los experimentos <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>, <code class="docutils literal notranslate"><span class="pre">ex_20</span></code>, y <code class="docutils literal notranslate"><span class="pre">ex_21</span></code>, la MSD es particularmente alta, lo que indica una mayor variabilidad en los errores de predicción.</p></li>
+<li><p><strong>MAE (Error Absoluto Medio) en el conjunto de Test</strong>: Los valores de MAE para <code class="docutils literal notranslate"><span class="pre">ex_1</span></code> son relativamente bajos (9.4), lo que muestra un buen desempeño en ese conjunto de datos. Por otro lado, experimentos como <code class="docutils literal notranslate"><span class="pre">ex_20</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_21</span></code> tienen valores muy altos de MAE en el test, lo que indica que las predicciones durante el test no fueron precisas.</p></li>
+</ul>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./models"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="series_de_tiempos.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Series de tiempos</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="holt_model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Suavización Exponencial de Segundo Orden (DES)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jose Javier Mercado Reyes
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

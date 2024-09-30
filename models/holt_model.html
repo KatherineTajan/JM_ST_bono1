@@ -1,0 +1,836 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Suavización Exponencial de Segundo Orden (DES) &#8212; Análisis de Series de Tiempo: Modelos de Suavización Exponencial</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'models/holt_model';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Suavización Exponencial de Segundo Orden con Actualización del Factor de Descuento" href="holt_discount.html" />
+    <link rel="prev" title="Suavización Exponencial Simple (SES)" href="ses_model.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Análisis de Series de Tiempo: Modelos de Suavización Exponencial</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Introducción
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../eda.html">EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="series_de_tiempos.html">Series de tiempos</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="ses_model.html">Suavización Exponencial Simple (SES)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Suavización Exponencial de Segundo Orden (DES)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="holt_discount.html">Suavización Exponencial de Segundo Orden con Actualización del Factor de Descuento</a></li>
+<li class="toctree-l1"><a class="reference internal" href="holt_winters.html">Holt winter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conclusions.html">Conclusiones</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/models/holt_model.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Suavización Exponencial de Segundo Orden (DES)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#formulas-principales">Fórmulas Principales</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="suavizacion-exponencial-de-segundo-orden-des">
+<h1>Suavización Exponencial de Segundo Orden (DES)<a class="headerlink" href="#suavizacion-exponencial-de-segundo-orden-des" title="Link to this heading">#</a></h1>
+<p>La <strong>suavización exponencial de segundo orden</strong> o <strong>suavización exponencial doble (DES)</strong> es una extensión de la suavización de primer orden. En lugar de utilizar un solo parámetro de suavización, <strong>DES</strong> emplea dos niveles de suavización para capturar tanto el valor de la serie como su tendencia. Este método es particularmente útil para series temporales que exhiben una <strong>tendencia lineal</strong> o cambiante.</p>
+<section id="formulas-principales">
+<h2>Fórmulas Principales<a class="headerlink" href="#formulas-principales" title="Link to this heading">#</a></h2>
+<p>La suavización exponencial de segundo orden utiliza las siguientes fórmulas para descomponer la serie en dos componentes:</p>
+<ol class="arabic">
+<li><p><strong>Suavización del nivel (S)</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+   S_t = \lambda y_t + (1 - \lambda) (S_{t-1} + T_{t-1})
+   \]</div>
+<p>donde <span class="math notranslate nohighlight">\( S_t \)</span> es el nivel suavizado en el tiempo <span class="math notranslate nohighlight">\( t \)</span>, <span class="math notranslate nohighlight">\( y_t \)</span> es el valor real de la serie, <span class="math notranslate nohighlight">\( T_{t-1} \)</span> es la tendencia en el tiempo <span class="math notranslate nohighlight">\( t-1 \)</span>, y <span class="math notranslate nohighlight">\( \lambda \)</span> es el parámetro de suavización.</p>
+</li>
+<li><p><strong>Suavización de la tendencia (T)</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+   T_t = \beta (S_t - S_{t-1}) + (1 - \beta) T_{t-1}
+   \]</div>
+<p>donde <span class="math notranslate nohighlight">\( T_t \)</span> es la tendencia suavizada en el tiempo <span class="math notranslate nohighlight">\( t \)</span>, y <span class="math notranslate nohighlight">\( \beta \)</span> es el parámetro de suavización para la tendencia.</p>
+</li>
+<li><p><strong>Predicción (h pasos hacia adelante)</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+   \hat{y}_{t+h} = S_t + h T_t
+   \]</div>
+<p>donde <span class="math notranslate nohighlight">\( \hat{y}_{t+h} \)</span> es la predicción para <span class="math notranslate nohighlight">\( h \)</span> periodos hacia adelante.</p>
+</li>
+</ol>
+<p>Se aplicó DES con un valor de <span class="math notranslate nohighlight">\(\lambda = 0.4\)</span> para modelar las series de tiempo de los distintos experimentos y predecir el comportamiento futuro en los conjuntos de validación y test. Los resultados muestran que <strong>DES</strong> es capaz de ajustar mejor las series de tiempo que presentan tendencias claras, ofreciendo predicciones más precisas, acompañadas de intervalos de predicción para reflejar la incertidumbre de los modelos.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importar las librerías necesarias</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<span class="c1"># Ruta a la carpeta donde se encuentran los archivos de entrenamiento</span>
+<span class="n">train_folder</span> <span class="o">=</span> <span class="s1">&#39;/Users/josejavier-yenifer/Documents/Serie de Tiempo/Bono 1/train&#39;</span>
+
+<span class="c1"># Nombres de los archivos CSV</span>
+<span class="n">train_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24.csv&#39;</span><span class="p">]</span>
+
+<span class="c1"># Cargar los archivos CSV en variables con prefijo &#39;df_&#39; y nombre del archivo (sin .csv)</span>
+<span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">train_files</span><span class="p">:</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Eliminar la extensión .csv</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">train_folder</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    
+    <span class="c1"># Crear una variable dinámica con el nombre df_&lt;nombre_archivo&gt;</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;df_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="c1"># Guardar el DataFrame para mostrar luego</span>
+    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">file_name</span><span class="p">,</span> <span class="nb">globals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;df_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Función de suavización exponencial de segundo grado (doble)</span>
+<span class="k">def</span> <span class="nf">secondsmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">ytilde1</span> <span class="o">=</span> <span class="n">firstsmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>  <span class="c1"># Suavización de primer orden</span>
+    <span class="n">ytilde2</span> <span class="o">=</span> <span class="n">firstsmooth</span><span class="p">(</span><span class="n">ytilde1</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">)</span>   <span class="c1"># Suavización de segundo orden</span>
+    <span class="n">y_hat</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ytilde1</span> <span class="o">-</span> <span class="n">ytilde2</span>             <span class="c1"># Estimación del nivel</span>
+    <span class="n">trend</span> <span class="o">=</span> <span class="p">(</span><span class="n">lambda_</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">lambda_</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">ytilde1</span> <span class="o">-</span> <span class="n">ytilde2</span><span class="p">)</span>  <span class="c1"># Estimación de la tendencia</span>
+    <span class="k">return</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">trend</span>
+
+<span class="c1"># Función de suavización exponencial simple (primer orden)</span>
+<span class="k">def</span> <span class="nf">firstsmooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">ytilde</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ytilde</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">lambda_</span><span class="p">)</span> <span class="o">*</span> <span class="n">start</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+        <span class="n">ytilde</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">lambda_</span><span class="p">)</span> <span class="o">*</span> <span class="n">ytilde</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">ytilde</span>
+
+<span class="c1"># Función para calcular el intervalo de predicción</span>
+<span class="k">def</span> <span class="nf">prediction_interval</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+    <span class="n">std_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>  <span class="c1"># Desviación estándar de los errores</span>
+    <span class="n">z_score</span> <span class="o">=</span> <span class="mf">1.96</span>  <span class="c1"># Para un nivel de confianza del 95%</span>
+    <span class="n">interval_size</span> <span class="o">=</span> <span class="n">z_score</span> <span class="o">*</span> <span class="n">std_err</span>
+    <span class="k">return</span> <span class="n">interval_size</span>
+
+<span class="c1"># Función de métricas de precisión</span>
+<span class="k">def</span> <span class="nf">measacc_fs</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
+    <span class="n">prederr</span> <span class="o">=</span> <span class="n">y_true</span> <span class="o">-</span> <span class="n">y_pred</span>
+    <span class="n">SSE</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prederr</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">MAPE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">prederr</span> <span class="o">/</span> <span class="n">y_true</span><span class="p">))</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="n">MAD</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">prederr</span><span class="p">))</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="n">MSD</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prederr</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;SSE&quot;</span><span class="p">:</span> <span class="n">SSE</span><span class="p">,</span> <span class="s2">&quot;MAPE&quot;</span><span class="p">:</span> <span class="n">MAPE</span><span class="p">,</span> <span class="s2">&quot;MAD&quot;</span><span class="p">:</span> <span class="n">MAD</span><span class="p">,</span> <span class="s2">&quot;MSD&quot;</span><span class="p">:</span> <span class="n">MSD</span><span class="p">}</span>
+
+<span class="c1"># Parámetro lambda (tasa de suavización)</span>
+<span class="n">lambda_</span> <span class="o">=</span> <span class="mf">0.4</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># División en entrenamiento, validación y test</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># 80% para entrenamiento</span>
+<span class="n">val_size</span> <span class="o">=</span> <span class="mf">0.1</span>    <span class="c1"># 10% para validación</span>
+<span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.1</span>   <span class="c1"># 10% para test</span>
+
+<span class="c1"># Crear un DataFrame para almacenar todas las métricas</span>
+<span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Experimento&#39;</span><span class="p">,</span> <span class="s1">&#39;SSE_Train&#39;</span><span class="p">,</span> <span class="s1">&#39;MAPE_Train&#39;</span><span class="p">,</span> <span class="s1">&#39;MAD_Train&#39;</span><span class="p">,</span> <span class="s1">&#39;MSD_Train&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;SSE_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MAPE_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MAD_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MSD_Val&#39;</span><span class="p">,</span> <span class="s1">&#39;MAE_Test&#39;</span><span class="p">])</span>
+
+<span class="c1"># Aplicar suavización exponencial de segundo grado a cada serie de tiempo</span>
+<span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="c1"># Definir la longitud de cada conjunto</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">train_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">train_size</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">val_end</span> <span class="o">=</span> <span class="n">train_end</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_size</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    
+    <span class="c1"># Dividir en conjuntos de entrenamiento, validación y test</span>
+    <span class="n">train_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">]</span>
+    <span class="n">val_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">]</span>
+    <span class="n">test_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:]</span>
+    
+    <span class="c1"># Aplicar la suavización de segundo grado en los datos de entrenamiento</span>
+    <span class="n">smooth_train</span><span class="p">,</span> <span class="n">trend_train</span> <span class="o">=</span> <span class="n">secondsmooth</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">)</span>
+    
+    <span class="c1"># Suavización de segundo grado para el conjunto de validación</span>
+    <span class="n">smooth_val</span><span class="p">,</span> <span class="n">trend_val</span> <span class="o">=</span> <span class="n">secondsmooth</span><span class="p">(</span><span class="n">val_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">smooth_train</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Suavización de segundo grado para el conjunto de test, usando el último valor del conjunto de validación</span>
+    <span class="n">smooth_test</span><span class="p">,</span> <span class="n">trend_test</span> <span class="o">=</span> <span class="n">secondsmooth</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">smooth_val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Intervalo de predicción</span>
+    <span class="n">pred_interval</span> <span class="o">=</span> <span class="n">prediction_interval</span><span class="p">(</span><span class="n">smooth_test</span><span class="p">)</span>
+    
+    <span class="c1"># Graficar la serie original con tres colores para los conjuntos de datos</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Entrenamiento&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Validación&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Test&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Graficar la suavización en los tres conjuntos</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][:</span><span class="n">train_end</span><span class="p">],</span> <span class="n">smooth_train</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Suavización DES Entrenamiento ($\lambda=</span><span class="si">{</span><span class="n">lambda_</span><span class="si">}</span><span class="s1">$)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">train_end</span><span class="p">:</span><span class="n">val_end</span><span class="p">],</span> <span class="n">smooth_val</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Suavización DES Validación&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">smooth_test</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Suavización DES Test&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Graficar el intervalo de predicción para el test</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="n">val_end</span><span class="p">:],</span> <span class="n">smooth_test</span> <span class="o">-</span> <span class="n">pred_interval</span><span class="p">,</span> <span class="n">smooth_test</span> <span class="o">+</span> <span class="n">pred_interval</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Intervalo de Predicción 95%&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Configuración del gráfico</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DES con Entrenamiento, Validación y Test - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Tiempo&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Potencia Eléctrica (W)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1"># Calcular las métricas de precisión en el conjunto de entrenamiento</span>
+    <span class="n">metrics_train</span> <span class="o">=</span> <span class="n">measacc_fs</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_train</span><span class="p">)</span>
+    
+    <span class="c1"># Calcular las métricas de precisión en el conjunto de validación</span>
+    <span class="n">metrics_val</span> <span class="o">=</span> <span class="n">measacc_fs</span><span class="p">(</span><span class="n">val_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_val</span><span class="p">)</span>
+    
+    <span class="c1"># Calcular solo el MAE (MAD) en el conjunto de test</span>
+    <span class="n">mae_test</span> <span class="o">=</span> <span class="n">calculate_mae</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_test</span><span class="p">)</span>
+    
+    <span class="c1"># Crear un DataFrame temporal con las métricas del experimento actual</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Experimento&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">],</span>
+        <span class="s1">&#39;SSE_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;SSE&#39;</span><span class="p">]],</span> <span class="s1">&#39;MAPE_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MAPE&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;MAD_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MAD&#39;</span><span class="p">]],</span> <span class="s1">&#39;MSD_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MSD&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;SSE_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;SSE&#39;</span><span class="p">]],</span> <span class="s1">&#39;MAPE_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;MAPE&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;MAD_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;MAD&#39;</span><span class="p">]],</span> <span class="s1">&#39;MSD_Val&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_val</span><span class="p">[</span><span class="s1">&#39;MSD&#39;</span><span class="p">]],</span>
+        <span class="s1">&#39;MAE_Test&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">mae_test</span><span class="p">]</span>
+    <span class="p">})</span>
+    
+    <span class="c1"># Usar pd.concat() para agregar las filas al DataFrame de métricas</span>
+    <span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">metrics_df</span><span class="p">,</span> <span class="n">temp_df</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;&gt;:83: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+&lt;&gt;:83: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+/var/folders/pc/g1c35bc91zbfqvk3gwrrc_5c0000gn/T/ipykernel_74017/3698066171.py:83: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+  plt.plot(df[&#39;time&#39;][:train_end], smooth_train, color=&#39;red&#39;, linestyle=&#39;--&#39;, label=f&#39;Suavización DES Entrenamiento ($\lambda={lambda_}$)&#39;)
+</pre></div>
+</div>
+<img alt="../_images/2c4a969e316c035d69d303bd3f934db0d5a2bf801bfd851c73561fd511eea9b9.png" src="../_images/2c4a969e316c035d69d303bd3f934db0d5a2bf801bfd851c73561fd511eea9b9.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/pc/g1c35bc91zbfqvk3gwrrc_5c0000gn/T/ipykernel_74017/3698066171.py:83: SyntaxWarning: invalid escape sequence &#39;\l&#39;
+  plt.plot(df[&#39;time&#39;][:train_end], smooth_train, color=&#39;red&#39;, linestyle=&#39;--&#39;, label=f&#39;Suavización DES Entrenamiento ($\lambda={lambda_}$)&#39;)
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">104</span>
+<span class="g g-Whitespace">    </span><span class="mi">101</span> <span class="n">metrics_val</span> <span class="o">=</span> <span class="n">measacc_fs</span><span class="p">(</span><span class="n">val_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_val</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">103</span> <span class="c1"># Calcular solo el MAE (MAD) en el conjunto de test</span>
+<span class="ne">--&gt; </span><span class="mi">104</span> <span class="n">mae_test</span> <span class="o">=</span> <span class="n">calculate_mae</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">smooth_test</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">106</span> <span class="c1"># Crear un DataFrame temporal con las métricas del experimento actual</span>
+<span class="g g-Whitespace">    </span><span class="mi">107</span> <span class="n">temp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+<span class="g g-Whitespace">    </span><span class="mi">108</span>     <span class="s1">&#39;Experimento&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="p">],</span>
+<span class="g g-Whitespace">    </span><span class="mi">109</span>     <span class="s1">&#39;SSE_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;SSE&#39;</span><span class="p">]],</span> <span class="s1">&#39;MAPE_Train&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metrics_train</span><span class="p">[</span><span class="s1">&#39;MAPE&#39;</span><span class="p">]],</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">113</span>     <span class="s1">&#39;MAE_Test&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">mae_test</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">114</span> <span class="p">})</span>
+
+<span class="ne">NameError</span>: name &#39;calculate_mae&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<p>Para los experimentos realizados, se aplicó la <strong>suavización exponencial de segundo grado</strong> (DES) con un parámetro de suavización <span class="math notranslate nohighlight">\(\lambda = 0.4\)</span> en los conjuntos de <strong>entrenamiento, validación y test</strong>.</p>
+<ol class="arabic simple">
+<li><p><strong>Resultados de Suavización</strong>:</p>
+<ul class="simple">
+<li><p>En cada serie de tiempo se observa que la <strong>suavización</strong> sigue muy de cerca el comportamiento de los datos originales en los conjuntos de <strong>entrenamiento</strong> y <strong>validación</strong>, mostrando una tendencia suave y consistente.</p></li>
+<li><p>Para el conjunto de <strong>test</strong>, los resultados predicen de forma aceptable la continuidad de la tendencia con <strong>intervalos de predicción del 95%</strong>. Aunque, en algunos casos, el intervalo se amplía considerablemente cuando la serie tiene mayor variabilidad.</p></li>
+</ul>
+</li>
+<li><p><strong>Intervalos de Predicción</strong>:</p>
+<ul class="simple">
+<li><p>Se añadieron los intervalos de predicción al 95%, que permiten visualizar la <strong>incertidumbre</strong> en las predicciones. Los intervalos son más amplios en aquellas series con mayor variabilidad (por ejemplo, en <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>), lo que indica un mayor grado de <strong>incertidumbre</strong> en las predicciones.</p></li>
+</ul>
+</li>
+<li><p><strong>Patrones en los Experimentos</strong>:</p>
+<ul class="simple">
+<li><p>En las series como <code class="docutils literal notranslate"><span class="pre">ex_1</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_23</span></code>, los resultados muestran que la suavización capta bastante bien la <strong>estructura repetitiva</strong> de los datos. Sin embargo, en <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>, donde la tendencia es ascendente, la <strong>predicción</strong> se ajusta con más dificultad debido a la naturaleza del crecimiento de la serie.</p></li>
+</ul>
+</li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mostrar el DataFrame con todas las métricas</span>
+<span class="n">metrics_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Experimento</th>
+      <th>SSE_Train</th>
+      <th>MAPE_Train</th>
+      <th>MAD_Train</th>
+      <th>MSD_Train</th>
+      <th>SSE_Val</th>
+      <th>MAPE_Val</th>
+      <th>MAD_Val</th>
+      <th>MSD_Val</th>
+      <th>MAE_Test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ex_1</td>
+      <td>2.945020e+05</td>
+      <td>0.273924</td>
+      <td>5.716550</td>
+      <td>37.109632</td>
+      <td>2.566182e+04</td>
+      <td>0.482716</td>
+      <td>4.757548</td>
+      <td>25.868767</td>
+      <td>5.067746</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ex_9</td>
+      <td>1.008923e+07</td>
+      <td>1.967260</td>
+      <td>32.214957</td>
+      <td>1067.078517</td>
+      <td>1.385972e+06</td>
+      <td>1.433859</td>
+      <td>33.541668</td>
+      <td>1173.558030</td>
+      <td>35.215603</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ex_20</td>
+      <td>3.251867e+06</td>
+      <td>1.842175</td>
+      <td>24.914725</td>
+      <td>625.840543</td>
+      <td>4.187019e+05</td>
+      <td>0.956357</td>
+      <td>25.298715</td>
+      <td>645.149316</td>
+      <td>24.997323</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ex_21</td>
+      <td>3.159150e+06</td>
+      <td>1.889505</td>
+      <td>24.547868</td>
+      <td>607.996513</td>
+      <td>4.214467e+05</td>
+      <td>1.058770</td>
+      <td>25.374215</td>
+      <td>649.378523</td>
+      <td>25.080318</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ex_23</td>
+      <td>4.694129e+06</td>
+      <td>1.505539</td>
+      <td>25.160795</td>
+      <td>638.656956</td>
+      <td>5.936665e+05</td>
+      <td>1.001407</td>
+      <td>25.308344</td>
+      <td>646.695525</td>
+      <td>25.163759</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>ex_24</td>
+      <td>4.594702e+06</td>
+      <td>1.513268</td>
+      <td>25.121165</td>
+      <td>636.561605</td>
+      <td>5.750936e+05</td>
+      <td>1.457396</td>
+      <td>25.130478</td>
+      <td>637.576066</td>
+      <td>25.212119</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><strong>Suavización de Segundo Orden</strong>:</p>
+<ul class="simple">
+<li><p>Se observa una mejora significativa en las series con <strong>tendencia fuerte</strong> y alta variabilidad, como <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>. El <strong>MAE en el test</strong> para <code class="docutils literal notranslate"><span class="pre">ex_9</span></code> pasó de <strong>66.90</strong> en el primer orden a <strong>35.21</strong> en el segundo orden, lo que representa una mejora sustancial en la predicción.</p></li>
+<li><p>En series de tiempo como <code class="docutils literal notranslate"><span class="pre">ex_1</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_23</span></code>, que tienen comportamientos cíclicos, la suavización de segundo orden mantiene una <strong>precisión similar</strong> a la de primer orden, con valores del <strong>MAPE</strong> y <strong>MAE</strong> bastante consistentes entre ambas técnicas.</p></li>
+<li><p>Para la serie <code class="docutils literal notranslate"><span class="pre">ex_20</span></code>, donde se observa una variación más compleja, la suavización de segundo orden logra capturar mejor la tendencia general, reduciendo los errores en el conjunto de validación y test.</p></li>
+</ul>
+<p><strong>Comparación con la suaviazcion de primer orden</strong>:</p>
+<ul class="simple">
+<li><p>La <strong>suavización de segundo orden</strong> es superior en series de tiempo con <strong>tendencias marcadas</strong> o alta <strong>variabilidad</strong>, ofreciendo mejores predicciones en el conjunto de <strong>test</strong> (por ejemplo, <code class="docutils literal notranslate"><span class="pre">ex_9</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_20</span></code>).</p></li>
+<li><p>Para series más <strong>estables</strong> o <strong>cíclicas</strong> como <code class="docutils literal notranslate"><span class="pre">ex_1</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_23</span></code>, la diferencia entre los dos métodos no es tan pronunciada, y ambos enfoques logran resultados similares.</p></li>
+<li><p>La elección entre suavización de primer o segundo orden depende en gran medida de la <strong>estructura</strong> de la serie de tiempo, donde el segundo orden brinda más flexibilidad en la captura de <strong>tendencias</strong> sin perder precisión en las predicciones.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./models"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ses_model.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Suavización Exponencial Simple (SES)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="holt_discount.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Suavización Exponencial de Segundo Orden con Actualización del Factor de Descuento</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#formulas-principales">Fórmulas Principales</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jose Javier Mercado Reyes
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

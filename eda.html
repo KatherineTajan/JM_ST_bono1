@@ -1,0 +1,1437 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>EDA &#8212; Análisis de Series de Tiempo: Modelos de Suavización Exponencial</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'eda';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Series de tiempos" href="models/series_de_tiempos.html" />
+    <link rel="prev" title="Introducción" href="intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Análisis de Series de Tiempo: Modelos de Suavización Exponencial</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Introducción
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">EDA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/series_de_tiempos.html">Series de tiempos</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="conclusions.html">Conclusiones</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/eda.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>EDA</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-los-datos">Importación de los datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conteo-de-valores-nulos">Conteo de valores nulos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estadisticas-descriptivas">Estadísticas descriptivas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribuciones-individuales-de-la-potencia-electrica">Distribuciones individuales de la potencia eléctrica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qq-plots-de-la-potencia-electrica">QQ-plots de la potencia eléctrica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prueba-de-normalidad-de-kolmogorov-smirnov">Prueba de normalidad de Kolmogorov-Smirnov</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-correlacion">Análisis de correlación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graficos-de-series-de-tiempo">Gráficos de series de tiempo</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="eda">
+<h1>EDA<a class="headerlink" href="#eda" title="Link to this heading">#</a></h1>
+<section id="importacion-de-los-datos">
+<h2>Importación de los datos<a class="headerlink" href="#importacion-de-los-datos" title="Link to this heading">#</a></h2>
+<p>Se ha realizado la importación de los archivos <code class="docutils literal notranslate"><span class="pre">CSV</span></code> correspondientes a los experimentos. Los datos han sido organizados en variables dinámicas (<code class="docutils literal notranslate"><span class="pre">df_</span></code>) para facilitar el acceso en los análisis posteriores. Se validó la correcta carga mostrando las primeras filas de cada conjunto, organizadas en una cuadrícula para su inspección.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Importar las librerías necesarias</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="c1"># Ruta a la carpeta donde se encuentran los archivos de entrenamiento</span>
+<span class="n">train_folder</span> <span class="o">=</span> <span class="s1">&#39;/Users/josejavier-yenifer/Documents/Serie de Tiempo/Bono 1/train&#39;</span>
+
+<span class="c1"># Nombres de los archivos CSV</span>
+<span class="n">train_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24.csv&#39;</span><span class="p">]</span>
+
+<span class="c1"># Cargar los archivos CSV en variables con prefijo &#39;df_&#39; y nombre del archivo (sin .csv)</span>
+<span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">train_files</span><span class="p">:</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Eliminar la extensión .csv</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">train_folder</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    
+    <span class="c1"># Crear una variable dinámica con el nombre df_&lt;nombre_archivo&gt;</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;df_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="c1"># Guardar el DataFrame para mostrar luego</span>
+    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">file_name</span><span class="p">,</span> <span class="nb">globals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;df_</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]))</span>
+
+<span class="c1"># Mostrar los DataFrames en una cuadrícula de 3 columnas por 2 filas</span>
+<span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span>
+<span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="p">):</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Archivo: </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">50</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Archivo: ex_1
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>input_voltage</th>
+      <th>el_power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>810.07028</td>
+      <td>10</td>
+      <td>1228.791720</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>811.06938</td>
+      <td>10</td>
+      <td>1223.041745</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>812.06848</td>
+      <td>10</td>
+      <td>1244.960866</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>813.06758</td>
+      <td>10</td>
+      <td>1229.259058</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>814.06668</td>
+      <td>10</td>
+      <td>1248.117024</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--------------------------------------------------
+
+Archivo: ex_9
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>input_voltage</th>
+      <th>el_power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>818.84</td>
+      <td>3.445</td>
+      <td>1253.790314</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>819.84</td>
+      <td>3.445</td>
+      <td>1349.836854</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>820.84</td>
+      <td>3.445</td>
+      <td>1262.033813</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>821.84</td>
+      <td>3.445</td>
+      <td>1370.205819</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>822.84</td>
+      <td>3.445</td>
+      <td>1254.782490</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--------------------------------------------------
+
+Archivo: ex_20
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>input_voltage</th>
+      <th>el_power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>849.22</td>
+      <td>3.0</td>
+      <td>1238.511285</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>850.24</td>
+      <td>3.0</td>
+      <td>1149.563728</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>851.26</td>
+      <td>3.0</td>
+      <td>1226.959165</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>852.28</td>
+      <td>3.0</td>
+      <td>1158.086961</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>853.30</td>
+      <td>3.0</td>
+      <td>1230.435294</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--------------------------------------------------
+
+Archivo: ex_21
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>input_voltage</th>
+      <th>el_power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>847.72</td>
+      <td>3.0</td>
+      <td>1089.895066</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>848.74</td>
+      <td>3.0</td>
+      <td>1179.843179</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>849.78</td>
+      <td>3.0</td>
+      <td>1099.497553</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>850.80</td>
+      <td>3.0</td>
+      <td>1181.551142</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>851.82</td>
+      <td>3.0</td>
+      <td>1100.823819</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--------------------------------------------------
+
+Archivo: ex_23
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>input_voltage</th>
+      <th>el_power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>810.00</td>
+      <td>3.0</td>
+      <td>1102.949693</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>811.04</td>
+      <td>3.0</td>
+      <td>1199.403786</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>812.08</td>
+      <td>3.0</td>
+      <td>1113.199817</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>813.18</td>
+      <td>3.0</td>
+      <td>1200.377939</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>814.18</td>
+      <td>3.0</td>
+      <td>1105.465349</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--------------------------------------------------
+
+Archivo: ex_24
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time</th>
+      <th>input_voltage</th>
+      <th>el_power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>811.04</td>
+      <td>3.0</td>
+      <td>1217.413110</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>812.04</td>
+      <td>3.0</td>
+      <td>1140.090013</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>813.06</td>
+      <td>3.0</td>
+      <td>1223.751987</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>814.10</td>
+      <td>3.0</td>
+      <td>1124.810110</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>815.12</td>
+      <td>3.0</td>
+      <td>1207.671543</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>--------------------------------------------------
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="conteo-de-valores-nulos">
+<h2>Conteo de valores nulos<a class="headerlink" href="#conteo-de-valores-nulos" title="Link to this heading">#</a></h2>
+<p>Se muestra una tabla que cuenta la cantidad de valores <code class="docutils literal notranslate"><span class="pre">nulos</span></code> o <code class="docutils literal notranslate"><span class="pre">faltantes</span></code> en cada columna de los diferentes conjuntos de datos.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Almacenar los resultados de los datos nulos</span>
+<span class="n">null_counts</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Iterar sobre los DataFrames para contar los valores nulos</span>
+<span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="n">null_counts</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="c1"># Convertir los resultados en un DataFrame</span>
+<span class="n">null_counts_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">null_counts</span><span class="p">)</span>
+
+<span class="c1"># Mostrar la tabla con los resultados</span>
+<span class="n">null_counts_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ex_1</th>
+      <th>ex_9</th>
+      <th>ex_20</th>
+      <th>ex_21</th>
+      <th>ex_23</th>
+      <th>ex_24</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>time</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>input_voltage</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>el_power</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>No hay datos faltantes en ninguna de las columnas (<code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">input_voltage</span></code>, y <code class="docutils literal notranslate"><span class="pre">el_power</span></code>) para todos los conjuntos de datos. Esto indica que los datos están completos y no se requiere ningún tratamiento adicional para manejar valores ausentes antes del análisis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Crear pairplot para cada conjunto de datos</span>
+<span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pairplot de </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.02</span><span class="p">)</span>  <span class="c1"># Ajustar el título del gráfico</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/3cdcfddf9fb36bc04c21843b3004a20a97f79d423608a42792fc196c91f90df0.png" src="_images/3cdcfddf9fb36bc04c21843b3004a20a97f79d423608a42792fc196c91f90df0.png" />
+<img alt="_images/ada4d5e7b00eb925d64cf9b49fbfbdd448fa204b7a48b14538db2cdc73ae3f2a.png" src="_images/ada4d5e7b00eb925d64cf9b49fbfbdd448fa204b7a48b14538db2cdc73ae3f2a.png" />
+<img alt="_images/b60e9018060aa929affb4ccfb006256b00cbe31b1fa454a54bff70e34bba2e71.png" src="_images/b60e9018060aa929affb4ccfb006256b00cbe31b1fa454a54bff70e34bba2e71.png" />
+<img alt="_images/c513c07324f5b5ee0b94145ae16326419b44e953f88943c84ac391ea5bd0a635.png" src="_images/c513c07324f5b5ee0b94145ae16326419b44e953f88943c84ac391ea5bd0a635.png" />
+<img alt="_images/fd1b28c3b83c58a03bfcaeb1e1c9c594b19f16c193692835870f5de2e992f0b1.png" src="_images/fd1b28c3b83c58a03bfcaeb1e1c9c594b19f16c193692835870f5de2e992f0b1.png" />
+<img alt="_images/3b8d694c7c565b364170196a934f321003572c47546fb7e55a6f2770de10c6d7.png" src="_images/3b8d694c7c565b364170196a934f321003572c47546fb7e55a6f2770de10c6d7.png" />
+</div>
+</div>
+</section>
+<section id="estadisticas-descriptivas">
+<h2>Estadísticas descriptivas<a class="headerlink" href="#estadisticas-descriptivas" title="Link to this heading">#</a></h2>
+<p>Se presentan las estadísticas descriptivas de la columna <code class="docutils literal notranslate"><span class="pre">el_power</span></code> para cada conjunto de datos. Las métricas calculadas incluyen el número de observaciones, media, desviación estándar, valores mínimos y máximos, y los percentiles 25%, 50% y 75%.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Generar estadísticas descriptivas para cada DataFrame</span>
+<span class="n">desc_ex_1</span> <span class="o">=</span> <span class="n">df_ex_1</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">desc_ex_9</span> <span class="o">=</span> <span class="n">df_ex_9</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">desc_ex_20</span> <span class="o">=</span> <span class="n">df_ex_20</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">desc_ex_21</span> <span class="o">=</span> <span class="n">df_ex_21</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">desc_ex_23</span> <span class="o">=</span> <span class="n">df_ex_23</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">desc_ex_24</span> <span class="o">=</span> <span class="n">df_ex_24</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+
+<span class="c1"># Crear un DataFrame combinando los resultados, con las métricas como filas y los conjuntos de datos como columnas</span>
+<span class="n">desc_combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;ex_1&#39;</span><span class="p">:</span> <span class="n">desc_ex_1</span><span class="p">,</span>
+    <span class="s1">&#39;ex_9&#39;</span><span class="p">:</span> <span class="n">desc_ex_9</span><span class="p">,</span>
+    <span class="s1">&#39;ex_20&#39;</span><span class="p">:</span> <span class="n">desc_ex_20</span><span class="p">,</span>
+    <span class="s1">&#39;ex_21&#39;</span><span class="p">:</span> <span class="n">desc_ex_21</span><span class="p">,</span>
+    <span class="s1">&#39;ex_23&#39;</span><span class="p">:</span> <span class="n">desc_ex_23</span><span class="p">,</span>
+    <span class="s1">&#39;ex_24&#39;</span><span class="p">:</span> <span class="n">desc_ex_24</span>
+<span class="p">})</span>
+
+<span class="c1"># Mostrar el DataFrame resultante</span>
+<span class="n">desc_combined</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ex_1</th>
+      <th>ex_9</th>
+      <th>ex_20</th>
+      <th>ex_21</th>
+      <th>ex_23</th>
+      <th>ex_24</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>9920.000000</td>
+      <td>11819.000000</td>
+      <td>6495.000000</td>
+      <td>6495.000000</td>
+      <td>9188.000000</td>
+      <td>9023.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>2162.427874</td>
+      <td>1828.548454</td>
+      <td>1623.263494</td>
+      <td>1576.460277</td>
+      <td>1899.231847</td>
+      <td>1805.375104</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>1009.468755</td>
+      <td>402.170208</td>
+      <td>632.985147</td>
+      <td>638.042444</td>
+      <td>693.044107</td>
+      <td>680.139456</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>932.837260</td>
+      <td>1204.205671</td>
+      <td>1097.030791</td>
+      <td>1045.541020</td>
+      <td>1053.218306</td>
+      <td>1054.175250</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>990.027512</td>
+      <td>1449.908790</td>
+      <td>1158.548696</td>
+      <td>1112.552610</td>
+      <td>1212.052789</td>
+      <td>1221.472869</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2709.354147</td>
+      <td>1735.783127</td>
+      <td>1241.345876</td>
+      <td>1191.245597</td>
+      <td>1694.534657</td>
+      <td>1539.209904</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>3116.416457</td>
+      <td>2247.396267</td>
+      <td>1909.031616</td>
+      <td>1889.461847</td>
+      <td>2508.555589</td>
+      <td>2380.490784</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>3249.891217</td>
+      <td>2511.698262</td>
+      <td>3182.431061</td>
+      <td>3191.966802</td>
+      <td>3193.846351</td>
+      <td>3191.101416</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Las estadísticas descriptivas de los conjuntos de datos revelan varias diferencias clave entre los experimentos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ex_1</span></code> tiene la mayor media de <strong>potencia eléctrica</strong> (2162 W), mientras que <code class="docutils literal notranslate"><span class="pre">ex_21</span></code> tiene la más baja (1576 W), lo que indica una variabilidad significativa en los niveles de potencia entre los experimentos.</p></li>
+<li><p>La <strong>desviación estándar</strong> más alta se observa en <code class="docutils literal notranslate"><span class="pre">ex_1</span></code> (1009 W), lo que sugiere una mayor dispersión de los datos en comparación con los otros conjuntos.</p></li>
+<li><p>Los valores de <strong>mínimo</strong> y <strong>máximo</strong> varían considerablemente entre los experimentos, con <code class="docutils literal notranslate"><span class="pre">ex_1</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_24</span></code> mostrando los valores más altos en los extremos superiores.</p></li>
+<li><p>Los percentiles (25%, 50%, 75%) también reflejan diferentes patrones de distribución en los conjuntos de datos, destacando la concentración de la mayoría de las observaciones en distintos rangos de potencia.</p></li>
+</ul>
+</section>
+<section id="distribuciones-individuales-de-la-potencia-electrica">
+<h2>Distribuciones individuales de la potencia eléctrica<a class="headerlink" href="#distribuciones-individuales-de-la-potencia-electrica" title="Link to this heading">#</a></h2>
+<p>Se generan gráficos de densidad para la columna <code class="docutils literal notranslate"><span class="pre">el_power</span></code> de cada uno de los conjuntos de datos, organizados en una cuadrícula de 3 columnas y 2 filas. Esta visualización permite comparar fácilmente las distribuciones individuales y observar las diferencias en la potencia eléctrica entre los distintos experimentos.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Configurar una cuadrícula de 3 columnas y 2 filas para los subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Iterar sobre los DataFrames y los ejes de la cuadrícula</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">)):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">3</span>  <span class="c1"># Determinar la fila del subplot</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span>   <span class="c1"># Determinar la columna del subplot</span>
+    
+    <span class="c1"># Graficar en el subplot correspondiente</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Distribución de </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Potencia Eléctrica (W)&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Densidad&#39;</span><span class="p">)</span>
+
+<span class="c1"># Ajustar el diseño de los subplots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1"># Mostrar el gráfico</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ac29fee63b87797479f01eca8756779f5d41a01549e2f4e4a5c9370a851e77bf.png" src="_images/ac29fee63b87797479f01eca8756779f5d41a01549e2f4e4a5c9370a851e77bf.png" />
+</div>
+</div>
+<p>Las distribuciones de <strong>potencia eléctrica</strong> varían entre los experimentos:</p>
+<ul class="simple">
+<li><p><strong>ex_1</strong> y <strong>ex_9</strong> muestran distribuciones bimodales, con dos picos dominantes.</p></li>
+<li><p><strong>ex_20</strong>, <strong>ex_21</strong>, <strong>ex_23</strong>, y <strong>ex_24</strong> presentan mayor dispersión con múltiples picos, sugiriendo variabilidad en las condiciones del experimento.</p></li>
+<li><p>Los experimentos <strong>ex_21</strong>, <strong>ex_23</strong>, y <strong>ex_24</strong> comparten un patrón con un pico cerca de los 1000 vatios.</p></li>
+</ul>
+</section>
+<section id="qq-plots-de-la-potencia-electrica">
+<h2>QQ-plots de la potencia eléctrica<a class="headerlink" href="#qq-plots-de-la-potencia-electrica" title="Link to this heading">#</a></h2>
+<p>Se generan gráficos <strong>QQ-plots</strong> para la columna <code class="docutils literal notranslate"><span class="pre">el_power</span></code> de cada uno de los conjuntos de datos. Estos gráficos permiten evaluar visualmente si los datos siguen una distribución normal, comparando los cuantiles observados con los cuantiles teóricos de una distribución normal.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.graphics.gofplots</span> <span class="kn">import</span> <span class="n">qqplot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Configurar una cuadrícula de 3 columnas y 2 filas para los subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Iterar sobre los DataFrames y los ejes de la cuadrícula</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">)):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">3</span>  <span class="c1"># Determinar la fila del subplot</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span>   <span class="c1"># Determinar la columna del subplot</span>
+    
+    <span class="c1"># Generar el QQ plot en el subplot correspondiente</span>
+    <span class="n">qqplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">],</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;QQ-plot de </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Ajustar el diseño de los subplots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1"># Mostrar el gráfico</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/1531708dde50e79fb1132ff877168de45167890615bd49ccc21b9b3561e76705.png" src="_images/1531708dde50e79fb1132ff877168de45167890615bd49ccc21b9b3561e76705.png" />
+</div>
+</div>
+<p>Los <strong>QQ-plots</strong> muestran que las distribuciones de <code class="docutils literal notranslate"><span class="pre">el_power</span></code> en los distintos conjuntos de datos se desvían significativamente de una distribución normal. En general, los datos exhiben patrones escalonados y curvados, lo que indica la presencia de no normalidad. Los valores extremos en las colas de los gráficos sugieren que los datos incluyen outliers o efectos no lineales en las mediciones de potencia eléctrica.</p>
+</section>
+<section id="prueba-de-normalidad-de-kolmogorov-smirnov">
+<h2>Prueba de normalidad de Kolmogorov-Smirnov<a class="headerlink" href="#prueba-de-normalidad-de-kolmogorov-smirnov" title="Link to this heading">#</a></h2>
+<p>Se realiza la prueba de Kolmogorov-Smirnov para evaluar la normalidad de la distribución de <code class="docutils literal notranslate"><span class="pre">el_power</span></code> en cada conjunto de datos. Los resultados indican si podemos considerar que los datos siguen una distribución normal o si debemos rechazar esta hipótesis, basándonos en un nivel de significancia de 0.05</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Almacenar resultados de la prueba KS en un DataFrame</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Dataset&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;Statistic&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;p-value&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;Normality&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c1"># Nivel de significancia</span>
+
+<span class="k">for</span> <span class="n">df</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="c1"># Aplicar la prueba KS para cada conjunto de datos</span>
+    <span class="n">stat</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">kstest</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">],</span> <span class="s1">&#39;norm&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+    
+    <span class="c1"># Evaluar la normalidad</span>
+    <span class="n">normality</span> <span class="o">=</span> <span class="s1">&#39;No se rechaza H0&#39;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">else</span> <span class="s1">&#39;Se rechaza H0&#39;</span>
+    
+    <span class="c1"># Guardar los resultados</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;Dataset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;Statistic&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;p-value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;Normality&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normality</span><span class="p">)</span>
+
+<span class="c1"># Convertir los resultados en un DataFrame</span>
+<span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Mostrar la tabla con los resultados</span>
+<span class="n">results_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Dataset</th>
+      <th>Statistic</th>
+      <th>p-value</th>
+      <th>Normality</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ex_1</td>
+      <td>0.283479</td>
+      <td>0.000000e+00</td>
+      <td>Se rechaza H0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>ex_9</td>
+      <td>0.122652</td>
+      <td>2.051605e-155</td>
+      <td>Se rechaza H0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ex_20</td>
+      <td>0.265028</td>
+      <td>0.000000e+00</td>
+      <td>Se rechaza H0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>ex_21</td>
+      <td>0.258664</td>
+      <td>0.000000e+00</td>
+      <td>Se rechaza H0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ex_23</td>
+      <td>0.121091</td>
+      <td>7.330340e-118</td>
+      <td>Se rechaza H0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>ex_24</td>
+      <td>0.152485</td>
+      <td>1.194924e-183</td>
+      <td>Se rechaza H0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>La prueba de <strong>Kolmogorov-Smirnov</strong> aplicada a los conjuntos de datos revela que ninguno de ellos parece seguir una distribución normal. En todos los casos, el valor p es extremadamente bajo, lo que indica que se rechaza la hipótesis nula (H0) de normalidad</p>
+</section>
+<section id="analisis-de-correlacion">
+<h2>Análisis de correlación<a class="headerlink" href="#analisis-de-correlacion" title="Link to this heading">#</a></h2>
+<p>Se generan gráficos de correlación en forma de <strong>heatmap triangular</strong> para los conjuntos de datos. Cada gráfico muestra las relaciones entre las variables <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">input_voltage</span></code>, y <code class="docutils literal notranslate"><span class="pre">el_power</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Crear una cuadrícula de subplots para los heatmaps</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">)):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span>
+    
+    <span class="c1"># Calcular la correlación</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+    
+    <span class="c1"># Crear una máscara para el triángulo superior</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+    
+    <span class="c1"># Crear el heatmap con la máscara</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> 
+                <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span>
+    
+    <span class="c1"># Ajustar el título de cada subplot</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Correlación de </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Ajustar el diseño</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/7bb5d176418de0a9f2360eea6737ce354aab8b44e0817fa52f27656ea3e4059e.png" src="_images/7bb5d176418de0a9f2360eea6737ce354aab8b44e0817fa52f27656ea3e4059e.png" />
+</div>
+</div>
+<p>Los <strong>heatmaps</strong> de correlación revelan:</p>
+<ul class="simple">
+<li><p>En <code class="docutils literal notranslate"><span class="pre">ex_1</span></code>, <code class="docutils literal notranslate"><span class="pre">input_voltage</span></code> y <code class="docutils literal notranslate"><span class="pre">el_power</span></code> tienen una correlación fuerte (0.89), mientras que <code class="docutils literal notranslate"><span class="pre">time</span></code> tiene una relación negativa moderada con <code class="docutils literal notranslate"><span class="pre">el_power</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ex_9</span></code> muestra una correlación extremadamente fuerte entre las tres variables, especialmente entre <code class="docutils literal notranslate"><span class="pre">input_voltage</span></code> y <code class="docutils literal notranslate"><span class="pre">el_power</span></code> (0.97).</p></li>
+<li><p>Tanto en <code class="docutils literal notranslate"><span class="pre">ex_20</span></code> como en <code class="docutils literal notranslate"><span class="pre">ex_21</span></code>, <code class="docutils literal notranslate"><span class="pre">input_voltage</span></code> y <code class="docutils literal notranslate"><span class="pre">el_power</span></code> mantienen una correlación fuerte, con valores de 0.80 y 0.79, respectivamente.</p></li>
+<li><p>En <code class="docutils literal notranslate"><span class="pre">ex_23</span></code> y <code class="docutils literal notranslate"><span class="pre">ex_24</span></code>, la correlación entre <code class="docutils literal notranslate"><span class="pre">input_voltage</span></code> y <code class="docutils literal notranslate"><span class="pre">el_power</span></code> sigue siendo alta, alcanzando 0.98 en <code class="docutils literal notranslate"><span class="pre">ex_24</span></code>.</p></li>
+</ul>
+</section>
+<section id="graficos-de-series-de-tiempo">
+<h2>Gráficos de series de tiempo<a class="headerlink" href="#graficos-de-series-de-tiempo" title="Link to this heading">#</a></h2>
+<p>Se presentan las series de tiempo de la potencia eléctrica para cada conjunto de datos. Estos gráficos permiten visualizar cómo varía la potencia eléctrica en función del tiempo en los diferentes experimentos.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Lista de DataFrames y nombres para iterar</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">[</span><span class="n">df_ex_1</span><span class="p">,</span> <span class="n">df_ex_9</span><span class="p">,</span> <span class="n">df_ex_20</span><span class="p">,</span> <span class="n">df_ex_21</span><span class="p">,</span> <span class="n">df_ex_23</span><span class="p">,</span> <span class="n">df_ex_24</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ex_1&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_9&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_20&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_21&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_23&#39;</span><span class="p">,</span> <span class="s1">&#39;ex_24&#39;</span><span class="p">]</span>
+
+<span class="c1"># Crear una cuadrícula de subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Iterar sobre los DataFrames y graficar la serie de tiempo en cada subplot</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">names</span><span class="p">)):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">3</span>  <span class="c1"># Determinar la fila del subplot</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">3</span>   <span class="c1"># Determinar la columna del subplot</span>
+    
+    <span class="c1"># Graficar la serie de tiempo en el subplot correspondiente</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;el_power&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Potencia Eléctrica&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Serie de Tiempo - </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Tiempo&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Potencia Eléctrica (W)&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="c1"># Ajustar el diseño de los subplots</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1"># Mostrar el gráfico</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/bba867176b40f1eec5e154f811cc8ef9f77b651bfa4215772c15f733eba821f2.png" src="_images/bba867176b40f1eec5e154f811cc8ef9f77b651bfa4215772c15f733eba821f2.png" />
+</div>
+</div>
+<p>Los gráficos de las series de tiempo para la <strong>potencia eléctrica</strong> en diversos experimentos revelan características distintivas:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ex_1</span></code>, <code class="docutils literal notranslate"><span class="pre">ex_20</span></code>, <code class="docutils literal notranslate"><span class="pre">ex_21</span></code>, y <code class="docutils literal notranslate"><span class="pre">ex_23</span></code> exhiben patrones cíclicos o escalonados con cambios abruptos de potencia, sugiriendo transiciones entre diferentes fases de los experimentos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ex_9</span></code> muestra un incremento progresivo en la potencia eléctrica a lo largo del tiempo, indicativo de un comportamiento más gradual.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ex_24</span></code> presenta oscilaciones regulares similares a <code class="docutils literal notranslate"><span class="pre">ex_23</span></code>, lo que sugiere ciclos consistentes en la generación de potencia.</p></li>
+</ul>
+<p>Estos patrones indican variaciones significativas en el comportamiento de los experimentos, con la mayoría mostrando cambios rápidos en la potencia eléctrica, a excepción de <code class="docutils literal notranslate"><span class="pre">ex_9</span></code>, donde la potencia aumenta de manera más uniforme.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Introducción</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="models/series_de_tiempos.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Series de tiempos</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#importacion-de-los-datos">Importación de los datos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conteo-de-valores-nulos">Conteo de valores nulos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estadisticas-descriptivas">Estadísticas descriptivas</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#distribuciones-individuales-de-la-potencia-electrica">Distribuciones individuales de la potencia eléctrica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qq-plots-de-la-potencia-electrica">QQ-plots de la potencia eléctrica</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prueba-de-normalidad-de-kolmogorov-smirnov">Prueba de normalidad de Kolmogorov-Smirnov</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analisis-de-correlacion">Análisis de correlación</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graficos-de-series-de-tiempo">Gráficos de series de tiempo</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Jose Javier Mercado Reyes
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

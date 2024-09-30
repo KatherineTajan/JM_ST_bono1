@@ -1,0 +1,168 @@
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/asyncio/base_events.py", line 685, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/miniconda3/envs/ml_venv/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+
+# Función de suavización exponencial de segundo grado (doble)
+def secondsmooth(y, lambda_, start=None):
+    ytilde1 = firstsmooth(y, lambda_, start)  # Suavización de primer orden
+    ytilde2 = firstsmooth(ytilde1, lambda_)   # Suavización de segundo orden
+    y_hat = 2 * ytilde1 - ytilde2             # Estimación del nivel
+    trend = (lambda_ / (1 - lambda_)) * (ytilde1 - ytilde2)  # Estimación de la tendencia
+    return y_hat, trend
+
+# Función de suavización exponencial simple (primer orden)
+def firstsmooth(y, lambda_, start=None):
+    ytilde = y.copy()
+    if start is None:
+        start = y[0]
+    ytilde[0] = lambda_ * y[0] + (1 - lambda_) * start
+    for i in range(1, len(y)):
+        ytilde[i] = lambda_ * y[i] + (1 - lambda_) * ytilde[i - 1]
+    return ytilde
+
+# Función para calcular el intervalo de predicción
+def prediction_interval(y_true, alpha=0.05):
+    std_err = np.std(y_true)  # Desviación estándar de los errores
+    z_score = 1.96  # Para un nivel de confianza del 95%
+    interval_size = z_score * std_err
+    return interval_size
+
+# Función de métricas de precisión
+def measacc_fs(y_true, y_pred):
+    T = len(y_true)
+    prederr = y_true - y_pred
+    SSE = sum(prederr**2)
+    MAPE = 100 * sum(abs(prederr / y_true)) / T
+    MAD = sum(abs(prederr)) / T
+    MSD = sum(prederr**2) / T
+    return {"SSE": SSE, "MAPE": MAPE, "MAD": MAD, "MSD": MSD}
+
+# Parámetro lambda (tasa de suavización)
+lambda_ = 0.4
+
+# Lista de DataFrames y nombres para iterar
+dataframes = [df_ex_1, df_ex_9, df_ex_20, df_ex_21, df_ex_23, df_ex_24]
+names = ['ex_1', 'ex_9', 'ex_20', 'ex_21', 'ex_23', 'ex_24']
+
+# División en entrenamiento, validación y test
+train_size = 0.8  # 80% para entrenamiento
+val_size = 0.1    # 10% para validación
+test_size = 0.1   # 10% para test
+
+# Crear un DataFrame para almacenar todas las métricas
+metrics_df = pd.DataFrame(columns=['Experimento', 'SSE_Train', 'MAPE_Train', 'MAD_Train', 'MSD_Train',
+                                   'SSE_Val', 'MAPE_Val', 'MAD_Val', 'MSD_Val', 'MAE_Test'])
+
+# Aplicar suavización exponencial de segundo grado a cada serie de tiempo
+for df, name in zip(dataframes, names):
+    # Definir la longitud de cada conjunto
+    n = len(df)
+    train_end = int(train_size * n)
+    val_end = train_end + int(val_size * n)
+    
+    # Dividir en conjuntos de entrenamiento, validación y test
+    train_data = df['el_power'][:train_end]
+    val_data = df['el_power'][train_end:val_end]
+    test_data = df['el_power'][val_end:]
+    
+    # Aplicar la suavización de segundo grado en los datos de entrenamiento
+    smooth_train, trend_train = secondsmooth(train_data.values, lambda_)
+    
+    # Suavización de segundo grado para el conjunto de validación
+    smooth_val, trend_val = secondsmooth(val_data.values, lambda_, start=smooth_train[-1])
+    
+    # Suavización de segundo grado para el conjunto de test, usando el último valor del conjunto de validación
+    smooth_test, trend_test = secondsmooth(test_data.values, lambda_, start=smooth_val[-1])
+    
+    # Intervalo de predicción
+    pred_interval = prediction_interval(smooth_test)
+    
+    # Graficar la serie original con tres colores para los conjuntos de datos
+    plt.figure(figsize=(10, 6))
+    plt.plot(df['time'][:train_end], df['el_power'][:train_end], color='blue', label='Entrenamiento')
+    plt.plot(df['time'][train_end:val_end], df['el_power'][train_end:val_end], color='orange', label='Validación')
+    plt.plot(df['time'][val_end:], df['el_power'][val_end:], color='green', label='Test')
+    
+    # Graficar la suavización en los tres conjuntos
+    plt.plot(df['time'][:train_end], smooth_train, color='red', linestyle='--', label=f'Suavización DES Entrenamiento ($\lambda={lambda_}$)')
+    plt.plot(df['time'][train_end:val_end], smooth_val, color='red', linestyle='--', label='Suavización DES Validación')
+    plt.plot(df['time'][val_end:], smooth_test, color='red', linestyle='--', label='Suavización DES Test')
+    
+    # Graficar el intervalo de predicción para el test
+    plt.fill_between(df['time'][val_end:], smooth_test - pred_interval, smooth_test + pred_interval, color='gray', alpha=0.2, label='Intervalo de Predicción 95%')
+    
+    # Configuración del gráfico
+    plt.title(f'DES con Entrenamiento, Validación y Test - {name}')
+    plt.xlabel('Tiempo')
+    plt.ylabel('Potencia Eléctrica (W)')
+    plt.legend()
+    plt.show()
+
+    # Calcular las métricas de precisión en el conjunto de entrenamiento
+    metrics_train = measacc_fs(train_data.values, smooth_train)
+    
+    # Calcular las métricas de precisión en el conjunto de validación
+    metrics_val = measacc_fs(val_data.values, smooth_val)
+    
+    # Calcular solo el MAE (MAD) en el conjunto de test
+    mae_test = calculate_mae(test_data.values, smooth_test)
+    
+    # Crear un DataFrame temporal con las métricas del experimento actual
+    temp_df = pd.DataFrame({
+        'Experimento': [name],
+        'SSE_Train': [metrics_train['SSE']], 'MAPE_Train': [metrics_train['MAPE']],
+        'MAD_Train': [metrics_train['MAD']], 'MSD_Train': [metrics_train['MSD']],
+        'SSE_Val': [metrics_val['SSE']], 'MAPE_Val': [metrics_val['MAPE']],
+        'MAD_Val': [metrics_val['MAD']], 'MSD_Val': [metrics_val['MSD']],
+        'MAE_Test': [mae_test]
+    })
+    
+    # Usar pd.concat() para agregar las filas al DataFrame de métricas
+    metrics_df = pd.concat([metrics_df, temp_df], ignore_index=True)
+
+
+------------------
+
+----- stderr -----
+<>:83: SyntaxWarning: invalid escape sequence '\l'
+<>:83: SyntaxWarning: invalid escape sequence '\l'
+/var/folders/pc/g1c35bc91zbfqvk3gwrrc_5c0000gn/T/ipykernel_74017/3698066171.py:83: SyntaxWarning: invalid escape sequence '\l'
+  plt.plot(df['time'][:train_end], smooth_train, color='red', linestyle='--', label=f'Suavización DES Entrenamiento ($\lambda={lambda_}$)')
+----- stderr -----
+/var/folders/pc/g1c35bc91zbfqvk3gwrrc_5c0000gn/T/ipykernel_74017/3698066171.py:83: SyntaxWarning: invalid escape sequence '\l'
+  plt.plot(df['time'][:train_end], smooth_train, color='red', linestyle='--', label=f'Suavización DES Entrenamiento ($\lambda={lambda_}$)')
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[2], line 104[0m
+[1;32m    101[0m metrics_val [38;5;241m=[39m measacc_fs(val_data[38;5;241m.[39mvalues, smooth_val)
+[1;32m    103[0m [38;5;66;03m# Calcular solo el MAE (MAD) en el conjunto de test[39;00m
+[0;32m--> 104[0m mae_test [38;5;241m=[39m [43mcalculate_mae[49m(test_data[38;5;241m.[39mvalues, smooth_test)
+[1;32m    106[0m [38;5;66;03m# Crear un DataFrame temporal con las métricas del experimento actual[39;00m
+[1;32m    107[0m temp_df [38;5;241m=[39m pd[38;5;241m.[39mDataFrame({
+[1;32m    108[0m     [38;5;124m'[39m[38;5;124mExperimento[39m[38;5;124m'[39m: [name],
+[1;32m    109[0m     [38;5;124m'[39m[38;5;124mSSE_Train[39m[38;5;124m'[39m: [metrics_train[[38;5;124m'[39m[38;5;124mSSE[39m[38;5;124m'[39m]], [38;5;124m'[39m[38;5;124mMAPE_Train[39m[38;5;124m'[39m: [metrics_train[[38;5;124m'[39m[38;5;124mMAPE[39m[38;5;124m'[39m]],
+[0;32m   (...)[0m
+[1;32m    113[0m     [38;5;124m'[39m[38;5;124mMAE_Test[39m[38;5;124m'[39m: [mae_test]
+[1;32m    114[0m })
+
+[0;31mNameError[0m: name 'calculate_mae' is not defined
+
